@@ -43,3 +43,31 @@ export function jumpToLine(line: number) {
   });
   editor.focus();
 }
+
+function getVisiblePreviewContainer(): HTMLElement | null {
+  if (typeof document === "undefined") return null;
+  const el = document.querySelector<HTMLElement>(".mde-preview-container");
+  if (!el) return null;
+  if (el.offsetParent === null) return null;
+  const rect = el.getBoundingClientRect();
+  if (rect.width === 0 || rect.height === 0) return null;
+  return el;
+}
+
+function scrollPreviewToIndex(preview: HTMLElement, index: number): boolean {
+  const headers = preview.querySelectorAll<HTMLElement>(
+    "h1, h2, h3, h4, h5, h6"
+  );
+  const target = headers[index];
+  if (!target) return false;
+  preview.scrollTop = target.offsetTop - preview.offsetTop;
+  return true;
+}
+
+export function jumpToHeading(heading: Heading, index: number) {
+  const preview = getVisiblePreviewContainer();
+  if (preview && scrollPreviewToIndex(preview, index)) {
+    return;
+  }
+  jumpToLine(heading.line);
+}

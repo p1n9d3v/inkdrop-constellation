@@ -4,7 +4,7 @@ import ConstellationToc from "./constellation-toc";
 import { loadGraph, GraphData } from "./load-notes";
 import { emitToggle } from "./modal-bus";
 
-const EXPANDED_WIDTH = 400;
+const EXPANDED_WIDTH = 480;
 const COLLAPSED_WIDTH = 32;
 
 const ConstellationPane: React.FC = () => {

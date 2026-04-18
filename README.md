@@ -2,7 +2,7 @@
 
 Interactive note graph for [Inkdrop](https://www.inkdrop.app/). See your notes as a constellation of linked ideas — grouped by notebook, colored by tag, sized by connectivity.
 
-<!-- screenshot: sidebar pane next to the editor -->
+![Sidebar pane with outline and graph](./images/img2.png)
 
 ## Features
 
@@ -15,9 +15,11 @@ Interactive note graph for [Inkdrop](https://www.inkdrop.app/). See your notes a
 - **Two placements** — a persistent right-side pane, plus a full-screen modal for focused exploration.
 - **Toggles** — hide orphan nodes and show/hide notebook regions, live.
 
-<!-- screenshot: full-screen modal view -->
+![Full-screen modal view](./images/img1.png)
 
-<!-- screenshot: outline pane close-up -->
+## Requirements
+
+**Inkdrop 6.0.0 or later is required** — typically available in [Inkdrop Canary](https://www.inkdrop.app/canary). The plugin uses CodeMirror 6 APIs (`editor.state.doc`, `editor.dispatch`, etc.) that are not available in Inkdrop 5.x. Installing on an older Inkdrop will fail the `engines.inkdrop` compatibility check.
 
 ## Installation
 
@@ -57,25 +59,6 @@ The outline is extracted from the current note's markdown headings. Click any he
 ### What counts as a link
 
 Constellation parses every note's body for `inkdrop://note/<id>` references — the standard URL produced by Inkdrop's **Copy Note Link** command and common link-generating plugins. Links inside fenced or inline code blocks are ignored. Self-references and references to non-existent notes are skipped.
-
-## Development
-
-```
-git clone https://github.com/p1n9d3v/inkdrop-graphify.git
-cd inkdrop-graphify
-npm install
-INKDROP_HOME="$HOME/Library/Application Support/inkdrop" ipm link --dev
-```
-
-For Inkdrop Canary, set `INKDROP_HOME` to `~/Library/Application Support/inkdrop-canary` instead.
-
-Build in watch mode while iterating:
-
-```
-npm run build-watch
-```
-
-Reload Inkdrop (`Cmd+R` / `Ctrl+R`) to pick up changes.
 
 ## License
 

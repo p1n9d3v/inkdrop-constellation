@@ -1,15 +1,13 @@
 import * as React from "react";
-import { extractHeadings, jumpToLine, Heading } from "./toc";
+import { extractHeadings, jumpToHeading, Heading } from "./toc";
 import { useEditingNote } from "./use-editing-note";
 
-const LEVEL_BAR_COLOR: Record<number, string> = {
-  1: "#4ea1ff",
-  2: "#5ab0ff",
-  3: "#6dbbff",
-  4: "#87c7ff",
-  5: "#a5d4ff",
-  6: "#c5e0ff",
-};
+const GOLDEN_ANGLE = 137.508;
+
+function colorForIndex(index: number): string {
+  const hue = (index * GOLDEN_ANGLE) % 360;
+  return `hsl(${hue.toFixed(1)}, 65%, 62%)`;
+}
 
 const LEVEL_STYLE: Record<number, React.CSSProperties> = {
   1: { fontWeight: 600, fontSize: 13, letterSpacing: 0.2 },
@@ -71,16 +69,16 @@ function ensureStyles() {
   document.head.appendChild(el);
 }
 
-const TocItem: React.FC<{ h: Heading }> = ({ h }) => {
+const TocItem: React.FC<{ h: Heading; index: number }> = ({ h, index }) => {
   const indent = (h.level - 1) * 12;
-  const color = LEVEL_BAR_COLOR[h.level] ?? LEVEL_BAR_COLOR[6];
+  const color = colorForIndex(index);
   const extra = LEVEL_STYLE[h.level] ?? LEVEL_STYLE[6];
 
   return (
     <div
       className="constellation-toc-item"
       style={{ paddingLeft: indent, ...extra }}
-      onClick={() => jumpToLine(h.line)}
+      onClick={() => jumpToHeading(h, index)}
       title={h.text}
     >
       <div className="constellation-toc-bar" style={{ background: color }} />
@@ -134,7 +132,7 @@ const ConstellationToc: React.FC = () => {
         ) : headings.length === 0 ? (
           <div className="constellation-toc-empty">No headings</div>
         ) : (
-          headings.map((h, i) => <TocItem key={i} h={h} />)
+          headings.map((h, i) => <TocItem key={i} h={h} index={i} />)
         )}
       </div>
     </div>
