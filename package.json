@@ -7,11 +7,11 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/p1n9d3v/inkdrop-graphify.git"
+    "url": "git+https://github.com/p1n9d3v/inkdrop-constellation.git"
   },
-  "homepage": "https://github.com/p1n9d3v/inkdrop-graphify#readme",
+  "homepage": "https://github.com/p1n9d3v/inkdrop-constellation#readme",
   "bugs": {
-    "url": "https://github.com/p1n9d3v/inkdrop-graphify/issues"
+    "url": "https://github.com/p1n9d3v/inkdrop-constellation/issues"
   },
   "keywords": [
     "inkdrop-plugin",
