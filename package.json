@@ -1,0 +1,25 @@
+{
+  "name": "graphify",
+  "main": "./lib/index",
+  "version": "0.0.1",
+  "description": "Graphify pane for Inkdrop",
+  "engines": {
+    "inkdrop": "^6.0.0"
+  },
+  "scripts": {
+    "build": "tsc",
+    "build-watch": "tsc --watch"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^18.3.7",
+    "react": "^19.2.5",
+    "typescript": "^6.0.2",
+    "@inkdropapp/types": "^0.0.5"
+  },
+  "dependencies": {
+    "vis-data": "^8.0.3",
+    "vis-network": "^10.0.2"
+  }
+}
