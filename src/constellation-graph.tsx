@@ -1,5 +1,6 @@
 import * as React from "react";
-import { Network, Options } from "vis-network";
+import { Network } from "vis-network";
+import type { Options } from "vis-network";
 import { DataSet } from "vis-data";
 import type { GraphData } from "./load-notes";
 

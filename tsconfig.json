@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "CommonJS",
+    "moduleResolution": "Node10",
     "ignoreDeprecations": "6.0",
     "lib": ["ESNext", "DOM"],
     "declaration": true,
@@ -20,7 +20,7 @@
         "./node_modules/@inkdropapp/types/src/inkdrop-module/index.d.ts"
       ]
     },
-    "types": ["@inkdropapp/types"]
+    "types": ["@inkdropapp/types", "node"]
   },
   "exclude": ["node_modules", "lib"],
   "include": ["src"]
