@@ -2,7 +2,7 @@
 
 Interactive note graph for [Inkdrop](https://www.inkdrop.app/). See your notes as a constellation of linked ideas — grouped by notebook, colored by tag, sized by connectivity.
 
-![Sidebar pane with outline and graph](./images/img2.png)
+![Sidebar pane with outline and graph](https://raw.githubusercontent.com/p1n9d3v/inkdrop-constellation/main/images/img2.png)
 
 ## Features
 
@@ -15,7 +15,7 @@ Interactive note graph for [Inkdrop](https://www.inkdrop.app/). See your notes a
 - **Two placements** — a persistent right-side pane, plus a full-screen modal for focused exploration.
 - **Toggles** — hide orphan nodes and show/hide notebook regions, live.
 
-![Full-screen modal view](./images/img1.png)
+![Full-screen modal view](https://raw.githubusercontent.com/p1n9d3v/inkdrop-constellation/main/images/img1.png)
 
 ## Requirements
 
