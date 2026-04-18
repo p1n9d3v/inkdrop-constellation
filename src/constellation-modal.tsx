@@ -1,7 +1,7 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { onToggle } from "./modal-bus";
-import ConstellationGraph from "./graphify-graph";
+import ConstellationGraph from "./constellation-graph";
 import { loadGraph, GraphData } from "./load-notes";
 
 const ConstellationModal: React.FC = () => {

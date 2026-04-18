@@ -1,6 +1,6 @@
 import * as React from "react";
-import ConstellationGraph from "./graphify-graph";
-import ConstellationToc from "./graphify-toc";
+import ConstellationGraph from "./constellation-graph";
+import ConstellationToc from "./constellation-toc";
 import { loadGraph, GraphData } from "./load-notes";
 import { emitToggle } from "./modal-bus";
 

@@ -1,5 +1,5 @@
-import ConstellationModal from "./graphify-modal";
-import ConstellationPane from "./graphify-pane";
+import ConstellationModal from "./constellation-modal";
+import ConstellationPane from "./constellation-pane";
 import { emitToggle } from "./modal-bus";
 
 const paneName = "ConstellationPane";
