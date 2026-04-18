@@ -1,8 +1,8 @@
 {
-  "name": "graphify",
+  "name": "constellation",
   "main": "./lib/index",
   "version": "0.0.1",
-  "description": "Graphify pane for Inkdrop",
+  "description": "Interactive note graph for Inkdrop — visualize notes as a constellation of links, tags, and notebooks",
   "engines": {
     "inkdrop": "^6.0.0"
   },

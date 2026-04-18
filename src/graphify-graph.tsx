@@ -115,7 +115,7 @@ function hexAlpha(hex: string, alpha: number): string {
   return hex + a;
 }
 
-const GraphifyGraph: React.FC<Props> = ({
+const ConstellationGraph: React.FC<Props> = ({
   data,
   hideOrphans,
   showBooks,
@@ -214,7 +214,7 @@ const GraphifyGraph: React.FC<Props> = ({
         });
         onAfterOpen?.();
       } catch (e) {
-        console.error("graphify: open-note failed", e);
+        console.error("constellation: open-note failed", e);
       }
     });
 
@@ -320,4 +320,4 @@ const GraphifyGraph: React.FC<Props> = ({
   );
 };
 
-export default GraphifyGraph;
+export default ConstellationGraph;

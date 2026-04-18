@@ -20,9 +20,9 @@ const LEVEL_STYLE: Record<number, React.CSSProperties> = {
   6: { fontSize: 11.5, opacity: 0.6 },
 };
 
-const STYLE_TAG_ID = "graphify-toc-styles";
+const STYLE_TAG_ID = "constellation-toc-styles";
 const TOC_STYLES = `
-.graphify-toc-item {
+.constellation-toc-item {
   display: flex;
   align-items: center;
   gap: 6px;
@@ -34,27 +34,27 @@ const TOC_STYLES = `
   user-select: none;
   line-height: 1.35;
 }
-.graphify-toc-item:hover {
+.constellation-toc-item:hover {
   background: rgba(78, 161, 255, 0.12);
 }
-.graphify-toc-item:active {
+.constellation-toc-item:active {
   transform: translateX(1px);
 }
-.graphify-toc-bar {
+.constellation-toc-bar {
   flex: none;
   width: 2px;
   align-self: stretch;
   border-radius: 2px;
   opacity: 0.9;
 }
-.graphify-toc-text {
+.constellation-toc-text {
   flex: 1;
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.graphify-toc-empty {
+.constellation-toc-empty {
   opacity: 0.5;
   font-size: 12px;
   padding: 12px 8px;
@@ -78,18 +78,18 @@ const TocItem: React.FC<{ h: Heading }> = ({ h }) => {
 
   return (
     <div
-      className="graphify-toc-item"
+      className="constellation-toc-item"
       style={{ paddingLeft: indent, ...extra }}
       onClick={() => jumpToLine(h.line)}
       title={h.text}
     >
-      <div className="graphify-toc-bar" style={{ background: color }} />
-      <div className="graphify-toc-text">{h.text}</div>
+      <div className="constellation-toc-bar" style={{ background: color }} />
+      <div className="constellation-toc-text">{h.text}</div>
     </div>
   );
 };
 
-const GraphifyToc: React.FC = () => {
+const ConstellationToc: React.FC = () => {
   React.useEffect(() => {
     ensureStyles();
   }, []);
@@ -130,9 +130,9 @@ const GraphifyToc: React.FC = () => {
         }}
       >
         {!note ? (
-          <div className="graphify-toc-empty">No note open</div>
+          <div className="constellation-toc-empty">No note open</div>
         ) : headings.length === 0 ? (
-          <div className="graphify-toc-empty">No headings</div>
+          <div className="constellation-toc-empty">No headings</div>
         ) : (
           headings.map((h, i) => <TocItem key={i} h={h} />)
         )}
@@ -141,4 +141,4 @@ const GraphifyToc: React.FC = () => {
   );
 };
 
-export default GraphifyToc;
+export default ConstellationToc;

@@ -1,10 +1,10 @@
 import * as React from "react";
 import { createPortal } from "react-dom";
 import { onToggle } from "./modal-bus";
-import GraphifyGraph from "./graphify-graph";
+import ConstellationGraph from "./graphify-graph";
 import { loadGraph, GraphData } from "./load-notes";
 
-const GraphifyModal: React.FC = () => {
+const ConstellationModal: React.FC = () => {
   const [open, setOpen] = React.useState(false);
   const [data, setData] = React.useState<GraphData | null>(null);
   const [loading, setLoading] = React.useState(false);
@@ -21,7 +21,7 @@ const GraphifyModal: React.FC = () => {
     setLoading(true);
     loadGraph()
       .then(setData)
-      .catch((e) => console.error("graphify: loadGraph failed", e))
+      .catch((e) => console.error("constellation: loadGraph failed", e))
       .finally(() => setLoading(false));
   }, [open]);
 
@@ -81,7 +81,7 @@ const GraphifyModal: React.FC = () => {
             gap: 16,
           }}
         >
-          <div style={{ fontSize: 16, fontWeight: 600 }}>Graphify</div>
+          <div style={{ fontSize: 16, fontWeight: 600 }}>Constellation</div>
           <div style={{ fontSize: 12, opacity: 0.7 }}>{stats}</div>
           <label
             style={{
@@ -120,7 +120,7 @@ const GraphifyModal: React.FC = () => {
         </div>
         <div style={{ flex: 1, minHeight: 0 }}>
           {data ? (
-            <GraphifyGraph
+            <ConstellationGraph
               data={data}
               hideOrphans={hideOrphans}
               showBooks={showBooks}
@@ -150,4 +150,4 @@ const GraphifyModal: React.FC = () => {
   return createPortal(overlay, document.body);
 };
 
-export default GraphifyModal;
+export default ConstellationModal;

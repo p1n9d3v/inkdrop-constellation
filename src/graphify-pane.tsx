@@ -1,13 +1,13 @@
 import * as React from "react";
-import GraphifyGraph from "./graphify-graph";
-import GraphifyToc from "./graphify-toc";
+import ConstellationGraph from "./graphify-graph";
+import ConstellationToc from "./graphify-toc";
 import { loadGraph, GraphData } from "./load-notes";
 import { emitToggle } from "./modal-bus";
 
 const EXPANDED_WIDTH = 400;
 const COLLAPSED_WIDTH = 32;
 
-const GraphifyPane: React.FC = () => {
+const ConstellationPane: React.FC = () => {
   const [collapsed, setCollapsed] = React.useState(false);
   const [data, setData] = React.useState<GraphData | null>(null);
   const [loading, setLoading] = React.useState(false);
@@ -18,7 +18,7 @@ const GraphifyPane: React.FC = () => {
     setLoading(true);
     loadGraph()
       .then(setData)
-      .catch((e) => console.error("graphify pane: load failed", e))
+      .catch((e) => console.error("constellation pane: load failed", e))
       .finally(() => setLoading(false));
   }, []);
 
@@ -26,7 +26,7 @@ const GraphifyPane: React.FC = () => {
     setLoading(true);
     loadGraph()
       .then(setData)
-      .catch((e) => console.error("graphify pane: refresh failed", e))
+      .catch((e) => console.error("constellation pane: refresh failed", e))
       .finally(() => setLoading(false));
   };
 
@@ -45,7 +45,7 @@ const GraphifyPane: React.FC = () => {
         }}
       >
         <button
-          title="Expand Graphify"
+          title="Expand Constellation"
           onClick={() => setCollapsed(false)}
           style={{
             writingMode: "vertical-rl",
@@ -57,7 +57,7 @@ const GraphifyPane: React.FC = () => {
             padding: 4,
           }}
         >
-          Graphify ▶
+          Constellation ▶
         </button>
       </div>
     );
@@ -87,7 +87,7 @@ const GraphifyPane: React.FC = () => {
           fontSize: 12,
         }}
       >
-        <span style={{ fontWeight: 600 }}>Graphify</span>
+        <span style={{ fontWeight: 600 }}>Constellation</span>
         <label
           style={{
             display: "flex",
@@ -148,11 +148,11 @@ const GraphifyPane: React.FC = () => {
           borderBottom: "1px solid var(--border-color, #3a3a3a)",
         }}
       >
-        <GraphifyToc />
+        <ConstellationToc />
       </div>
       <div style={{ flex: 1, minHeight: 0, padding: 4 }}>
         {data ? (
-          <GraphifyGraph
+          <ConstellationGraph
             data={data}
             hideOrphans={hideOrphans}
             showBooks={showBooks}
@@ -190,4 +190,4 @@ const GraphifyPane: React.FC = () => {
   );
 };
 
-export default GraphifyPane;
+export default ConstellationPane;
