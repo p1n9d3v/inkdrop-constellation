@@ -1,0 +1,82 @@
+# Constellation
+
+Interactive note graph for [Inkdrop](https://www.inkdrop.app/). See your notes as a constellation of linked ideas — grouped by notebook, colored by tag, sized by connectivity.
+
+<!-- screenshot: sidebar pane next to the editor -->
+
+## Features
+
+- **Force-directed graph** of every note, with clickable nodes that open the corresponding note in the editor.
+- **Automatic link detection** — parses `inkdrop://note/<id>` references inside each note's body to build edges. Bidirectional links are merged into a single edge with arrows on both ends.
+- **Tag-based coloring** — node color comes from the first tag. Untagged notes render as muted diamonds.
+- **Notebook regions** — each notebook is drawn as a soft convex-hull region with its name as a label. Notes in the same notebook are pulled together by invisible clustering springs.
+- **Degree sizing** — well-connected notes appear larger (square-root scaling).
+- **Outline pane** — a clean, clickable heading list for the currently open note, synced to the editor.
+- **Two placements** — a persistent right-side pane, plus a full-screen modal for focused exploration.
+- **Toggles** — hide orphan nodes and show/hide notebook regions, live.
+
+<!-- screenshot: full-screen modal view -->
+
+<!-- screenshot: outline pane close-up -->
+
+## Installation
+
+```
+ipm install constellation
+```
+
+Or from Inkdrop → **Preferences → Plugins** → search for _constellation_.
+
+## Usage
+
+### Sidebar pane
+
+Once installed, Constellation appears as a pane on the right side of the editor. The top half shows the outline of the current note, the bottom half shows the full note graph.
+
+- Click any node to open that note in the editor.
+- Drag a node to push it around; it springs back into the force-directed layout when released.
+- Scroll to zoom; drag empty space to pan.
+- **↻** — refresh the graph from the current database state.
+- **⤢** — open the full-screen modal view.
+- **▶** — collapse the pane to a narrow strip.
+
+### Modal view
+
+Open from the command palette:
+
+```
+Constellation: Toggle Modal
+```
+
+Press `Esc` or click outside to close. Clicking a node opens the note and closes the modal.
+
+### Outline pane
+
+The outline is extracted from the current note's markdown headings. Click any heading to jump the editor's cursor to that line. Code-fenced content is skipped so headings inside code blocks don't pollute the list.
+
+### What counts as a link
+
+Constellation parses every note's body for `inkdrop://note/<id>` references — the standard URL produced by Inkdrop's **Copy Note Link** command and common link-generating plugins. Links inside fenced or inline code blocks are ignored. Self-references and references to non-existent notes are skipped.
+
+## Development
+
+```
+git clone https://github.com/p1n9d3v/inkdrop-graphify.git
+cd inkdrop-graphify
+npm install
+INKDROP_HOME="$HOME/Library/Application Support/inkdrop" ipm link --dev
+```
+
+For Inkdrop Canary, set `INKDROP_HOME` to `~/Library/Application Support/inkdrop-canary` instead.
+
+Build in watch mode while iterating:
+
+```
+npm run build-watch
+```
+
+Reload Inkdrop (`Cmd+R` / `Ctrl+R`) to pick up changes.
+
+## License
+
+MIT — see [LICENSE](./LICENSE).

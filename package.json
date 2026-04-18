@@ -1,22 +1,46 @@
 {
   "name": "constellation",
-  "main": "./lib/index",
   "version": "0.0.1",
   "description": "Interactive note graph for Inkdrop — visualize notes as a constellation of links, tags, and notebooks",
+  "main": "./lib/index",
+  "author": "p1n9d3v",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/p1n9d3v/inkdrop-graphify.git"
+  },
+  "homepage": "https://github.com/p1n9d3v/inkdrop-graphify#readme",
+  "bugs": {
+    "url": "https://github.com/p1n9d3v/inkdrop-graphify/issues"
+  },
+  "keywords": [
+    "inkdrop-plugin",
+    "graph",
+    "knowledge-graph",
+    "visualization",
+    "notes",
+    "outline"
+  ],
   "engines": {
     "inkdrop": "^6.0.0"
   },
+  "files": [
+    "lib/**/*",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "tsc",
-    "build-watch": "tsc --watch"
+    "build-watch": "tsc --watch",
+    "prepublishOnly": "tsc"
   },
   "devDependencies": {
+    "@inkdropapp/types": "^0.0.5",
     "@types/node": "^20.0.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^18.3.7",
     "react": "^19.2.5",
-    "typescript": "^6.0.2",
-    "@inkdropapp/types": "^0.0.5"
+    "typescript": "^6.0.2"
   },
   "dependencies": {
     "vis-data": "^8.0.3",
