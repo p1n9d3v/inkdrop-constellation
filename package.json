@@ -1,6 +1,6 @@
 {
   "name": "constellation",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Interactive note graph for Inkdrop — visualize notes as a constellation of links, tags, and notebooks",
   "main": "./lib/index",
   "author": "p1n9d3v",
@@ -38,12 +38,11 @@
     "@inkdropapp/types": "^0.0.5",
     "@types/node": "^20.0.0",
     "@types/react": "^19.2.14",
-    "@types/react-dom": "^18.3.7",
+    "@types/react-dom": "^19.2.3",
     "react": "^19.2.5",
     "typescript": "^6.0.2"
   },
   "dependencies": {
-    "vis-data": "^8.0.3",
-    "vis-network": "^10.0.2"
+    "three": "^0.184.0"
   }
 }

@@ -1,0 +1,58 @@
+import * as THREE from "three";
+import type { GraphData } from "./load-notes";
+export type RenderNode = {
+    id: string;
+    title: string;
+    label: string;
+    orphan: boolean;
+    degree: number;
+    start: THREE.Vector3;
+    target: THREE.Vector3;
+    normal: THREE.Vector3;
+    mesh: THREE.Mesh<THREE.BufferGeometry, THREE.MeshBasicMaterial>;
+    glow: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial> | null;
+    labelEl: HTMLDivElement;
+    color: THREE.Color;
+    baseSize: number;
+    delayMs: number;
+    phase: number;
+    hub: boolean;
+};
+export type RenderEdge = {
+    from: number;
+    to: number;
+    label: string;
+    color: THREE.Color;
+};
+export type RenderBook = {
+    memberIndexes: number[];
+    mesh: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
+    label: HTMLDivElement;
+};
+export declare const FORMATION_MS = 3200;
+export declare const MAX_PIXEL_RATIO = 2;
+export declare const ACTIVE_EDGE = 1.45;
+export declare const DIM_EDGE = 0.26;
+export declare const BASE_EDGE = 0.62;
+export declare const WHITE: any;
+export declare const CYAN: any;
+export declare const HIDDEN_TOOLTIP_TRANSFORM = "translate3d(-9999px, -9999px, 0)";
+export declare function averageVectors(vectors: THREE.Vector3[]): THREE.Vector3;
+export declare function makeTextLabel(text: string, color: string): HTMLDivElement;
+export declare function makeNodeLabel(text: string, color: string): HTMLDivElement;
+export declare function colorFromHex(hex: string | undefined, fallback?: number): THREE.Color;
+export declare function nodeColor(node: GraphData["nodes"][number]): THREE.Color;
+export declare function nodeDegree(node: GraphData["nodes"][number]): number;
+export declare function nodeBaseSize(degree: number, hub: boolean): number;
+export declare function chooseHubIds(data: GraphData): Set<string>;
+export declare function edgeColor(from: THREE.Color, to: THREE.Color): THREE.Color;
+export declare function edgeLabel(edge: GraphData["edges"][number], fromLabel: string, toLabel: string): string;
+export declare function createEdgeBuffers(edgeCount: number): {
+    geometry: THREE.BufferGeometry;
+    positions: Float32Array;
+    colors: Float32Array;
+};
+export declare function setEdgePosition(positions: Float32Array, index: number, from: THREE.Vector3, to: THREE.Vector3): void;
+export declare function clearEdge(positions: Float32Array, colors: Float32Array, index: number): void;
+export declare function setEdgeColor(colors: Float32Array, index: number, color: THREE.Color, intensity: number): void;
+export declare function disposeObject(object: THREE.Object3D): void;

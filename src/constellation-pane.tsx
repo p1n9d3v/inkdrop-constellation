@@ -4,7 +4,7 @@ import ConstellationToc from "./constellation-toc";
 import { loadGraph, GraphData } from "./load-notes";
 import { emitToggle } from "./modal-bus";
 
-const EXPANDED_WIDTH = 480;
+const EXPANDED_WIDTH = 560;
 const COLLAPSED_WIDTH = 32;
 
 const ConstellationPane: React.FC = () => {
@@ -69,6 +69,7 @@ const ConstellationPane: React.FC = () => {
     <div
       style={{
         width: EXPANDED_WIDTH,
+        flexShrink: 0,
         height: "100%",
         borderLeft: "1px solid var(--border-color, #3a3a3a)",
         display: "flex",

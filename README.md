@@ -1,16 +1,17 @@
 # Constellation
 
-Interactive note graph for [Inkdrop](https://www.inkdrop.app/). See your notes as a constellation of linked ideas — grouped by notebook, colored by tag, sized by connectivity.
+Interactive note graph for [Inkdrop](https://www.inkdrop.app/). See your notes as a 3D neural constellation of linked ideas — grouped by notebook, colored by tag, and sized by connectivity.
 
 ![Sidebar pane with outline and graph](https://raw.githubusercontent.com/p1n9d3v/inkdrop-constellation/main/images/img2.png)
 
 ## Features
 
-- **Force-directed graph** of every note, with clickable nodes that open the corresponding note in the editor.
+- **3D brain-shaped graph** of every note, with clickable particles that open the corresponding note in the editor.
 - **Automatic link detection** — parses `inkdrop://note/<id>` references inside each note's body to build edges. Bidirectional links are merged into a single edge with arrows on both ends.
-- **Tag-based coloring** — node color comes from the first tag. Untagged notes render as muted diamonds.
-- **Notebook regions** — each notebook is drawn as a soft convex-hull region with its name as a label. Notes in the same notebook are pulled together by invisible clustering springs.
-- **Degree sizing** — well-connected notes appear larger (square-root scaling).
+- **Tag-based coloring** — particle color comes from the first tag, while faint neural lines keep the overall brain form readable.
+- **Notebook regions** — each notebook is drawn as a subtle 3D region with its name as a label.
+- **Degree sizing** — the most connected notes appear as larger glowing hub particles.
+- **Hover context** — hover nodes or edges to see note and connection titles, with neighboring particles and edges highlighted.
 - **Outline pane** — a clean, clickable heading list for the currently open note, synced to the editor.
 - **Two placements** — a persistent right-side pane, plus a full-screen modal for focused exploration.
 - **Toggles** — hide orphan nodes and show/hide notebook regions, live.
@@ -35,9 +36,8 @@ Or from Inkdrop → **Preferences → Plugins** → search for _constellation_.
 
 Once installed, Constellation appears as a pane on the right side of the editor. The top half shows the outline of the current note, the bottom half shows the full note graph.
 
-- Click any node to open that note in the editor.
-- Drag a node to push it around; it springs back into the force-directed layout when released.
-- Scroll to zoom; drag empty space to pan.
+- Click any particle to open that note in the editor.
+- Scroll to zoom; drag the graph to rotate the 3D brain view.
 - **↻** — refresh the graph from the current database state.
 - **⤢** — open the full-screen modal view.
 - **▶** — collapse the pane to a narrow strip.

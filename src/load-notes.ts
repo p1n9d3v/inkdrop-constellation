@@ -66,10 +66,12 @@ function hashStr(s: string): number {
 
 export type GraphNode = {
   id: string;
+  title: string;
   label: string;
   orphan: boolean;
   hasTag: boolean;
   color: { background: string; border: string };
+  degree: number;
   value: number;
 };
 
@@ -77,6 +79,7 @@ export type GraphEdge = {
   id: string;
   from: string;
   to: string;
+  label: string;
   arrows: "to" | "to, from";
 };
 
@@ -112,6 +115,9 @@ export async function loadGraph(): Promise<GraphData> {
   }
 
   const noteIds = new Set<string>(docs.map((n) => n._id));
+  const titleById = new Map<string, string>(
+    docs.map((n) => [n._id, (n.title || "").trim() || "(untitled)"])
+  );
 
   const directed = new Set<string>();
   const SEP = "\u0000";
@@ -136,10 +142,13 @@ export async function loadGraph(): Promise<GraphData> {
     const reverseKey = `${to}${SEP}${from}`;
     const isBidi = directed.has(reverseKey);
     const sorted = [from, to].sort();
+    const fromTitle = truncate(titleById.get(from) ?? from, 24);
+    const toTitle = truncate(titleById.get(to) ?? to, 24);
     edges.push({
       id: isBidi ? `${sorted[0]}~${sorted[1]}` : `${from}|${to}`,
       from,
       to,
+      label: `${fromTitle} ${isBidi ? "<->" : "->"} ${toTitle}`,
       arrows: isBidi ? "to, from" : "to",
     });
     seen.add(key);
@@ -159,10 +168,12 @@ export async function loadGraph(): Promise<GraphData> {
     const d = degree.get(n._id) ?? 0;
     return {
       id: n._id,
+      title,
       label: truncate(title, 20),
       orphan: !connected.has(n._id),
       hasTag,
       color: { background: bg, border },
+      degree: d,
       value: Math.sqrt(d),
     };
   });

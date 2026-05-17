@@ -1,5 +1,6 @@
 export type GraphNode = {
     id: string;
+    title: string;
     label: string;
     orphan: boolean;
     hasTag: boolean;
@@ -7,12 +8,14 @@ export type GraphNode = {
         background: string;
         border: string;
     };
+    degree: number;
     value: number;
 };
 export type GraphEdge = {
     id: string;
     from: string;
     to: string;
+    label: string;
     arrows: "to" | "to, from";
 };
 export type GraphBook = {
