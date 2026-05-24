@@ -14,6 +14,48 @@ const ConstellationPane: React.FC = () => {
   const [hideOrphans, setHideOrphans] = React.useState(true);
   const [showBooks, setShowBooks] = React.useState(true);
 
+  const [width, setWidth] = React.useState(() => {
+    const saved = localStorage.getItem("inkdrop-constellation:width");
+    if (saved) {
+      const parsed = parseInt(saved, 10);
+      if (!isNaN(parsed)) {
+        return parsed;
+      }
+    }
+    return EXPANDED_WIDTH;
+  });
+  const [isHovered, setIsHovered] = React.useState(false);
+  const [isDragging, setIsDragging] = React.useState(false);
+  const [menuOpen, setMenuOpen] = React.useState(false);
+
+  const widthRef = React.useRef(width);
+  React.useEffect(() => {
+    widthRef.current = width;
+  }, [width]);
+
+  const handlePointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const startX = e.clientX;
+    const startWidth = widthRef.current;
+    setIsDragging(true);
+
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      const deltaX = moveEvent.clientX - startX;
+      const newWidth = Math.max(250, Math.min(startWidth - deltaX, window.innerWidth - 100));
+      setWidth(newWidth);
+    };
+
+    const handlePointerUp = () => {
+      setIsDragging(false);
+      localStorage.setItem("inkdrop-constellation:width", widthRef.current.toString());
+      document.removeEventListener("pointermove", handlePointerMove);
+      document.removeEventListener("pointerup", handlePointerUp);
+    };
+
+    document.addEventListener("pointermove", handlePointerMove);
+    document.addEventListener("pointerup", handlePointerUp);
+  };
+
   React.useEffect(() => {
     setLoading(true);
     loadGraph()
@@ -68,16 +110,44 @@ const ConstellationPane: React.FC = () => {
   return (
     <div
       style={{
-        width: EXPANDED_WIDTH,
+        width: width,
         flexShrink: 0,
         height: "100%",
-        borderLeft: "1px solid var(--border-color, #3a3a3a)",
         display: "flex",
         flexDirection: "column",
         background: "var(--main-background-color, transparent)",
         boxSizing: "border-box",
+        position: "relative",
       }}
     >
+      <div
+        onPointerDown={handlePointerDown}
+        onPointerOver={() => setIsHovered(true)}
+        onPointerOut={() => setIsHovered(false)}
+        style={{
+          position: "absolute",
+          top: 0,
+          left: -3,
+          width: 6,
+          height: "100%",
+          cursor: "col-resize",
+          zIndex: 100,
+          display: "flex",
+          justifyContent: "center",
+          background: "transparent",
+        }}
+      >
+        <div
+          style={{
+            width: 1,
+            height: "100%",
+            background: isHovered || isDragging
+              ? "var(--accent-color, #0088ff)"
+              : "var(--border-color, #3a3a3a)",
+            transition: "background-color 0.15s ease",
+          }}
+        />
+      </div>
       <div
         style={{
           display: "flex",
@@ -86,15 +156,20 @@ const ConstellationPane: React.FC = () => {
           padding: "6px 8px",
           borderBottom: "1px solid var(--border-color, #3a3a3a)",
           fontSize: 12,
+          boxSizing: "border-box",
+          position: "relative",
         }}
       >
-        <span style={{ fontWeight: 600 }}>Constellation</span>
+        {width >= 360 && (
+          <span style={{ fontWeight: 600, flexShrink: 0 }}>Constellation</span>
+        )}
         <label
           style={{
             display: "flex",
             gap: 4,
             cursor: "pointer",
             alignItems: "center",
+            flexShrink: 0,
           }}
         >
           <input
@@ -110,6 +185,7 @@ const ConstellationPane: React.FC = () => {
             gap: 4,
             cursor: "pointer",
             alignItems: "center",
+            flexShrink: 0,
           }}
         >
           <input
@@ -119,28 +195,171 @@ const ConstellationPane: React.FC = () => {
           />
           Books
         </label>
-        <button
-          onClick={() => emitToggle()}
-          title="Open in modal"
-          style={{ marginLeft: "auto", cursor: "pointer" }}
-        >
-          ⤢
-        </button>
-        <button
-          onClick={refresh}
-          title="Refresh"
-          style={{ cursor: "pointer" }}
-          disabled={loading}
-        >
-          ↻
-        </button>
-        <button
-          onClick={() => setCollapsed(true)}
-          title="Collapse"
-          style={{ cursor: "pointer" }}
-        >
-          ▶
-        </button>
+        {width >= 380 ? (
+          <div
+            style={{
+              marginLeft: "auto",
+              display: "flex",
+              alignItems: "center",
+              gap: 4,
+              flexShrink: 0,
+            }}
+          >
+            <button
+              onClick={() => emitToggle()}
+              title="Open in modal"
+              style={{ cursor: "pointer" }}
+            >
+              ⤢
+            </button>
+            <button
+              onClick={refresh}
+              title="Refresh"
+              style={{ cursor: "pointer" }}
+              disabled={loading}
+            >
+              ↻
+            </button>
+            <button
+              onClick={() => setCollapsed(true)}
+              title="Collapse"
+              style={{ cursor: "pointer" }}
+            >
+              ▶
+            </button>
+          </div>
+        ) : (
+          <div
+            style={{
+              marginLeft: "auto",
+              display: "flex",
+              alignItems: "center",
+              flexShrink: 0,
+            }}
+          >
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              title="Actions"
+              style={{
+                cursor: "pointer",
+                border: "none",
+                background: "transparent",
+                color: "var(--text-color, inherit)",
+                padding: "2px 6px",
+                fontSize: 14,
+                fontWeight: "bold",
+              }}
+            >
+              ⋮
+            </button>
+            {menuOpen && (
+              <>
+                <div
+                  onClick={() => setMenuOpen(false)}
+                  style={{
+                    position: "fixed",
+                    top: 0,
+                    left: 0,
+                    right: 0,
+                    bottom: 0,
+                    zIndex: 199,
+                    background: "transparent",
+                  }}
+                />
+                <div
+                  style={{
+                    position: "absolute",
+                    right: 8,
+                    top: 28,
+                    background: "var(--main-background-color, #1e1e1e)",
+                    border: "1px solid var(--border-color, #3a3a3a)",
+                    borderRadius: 6,
+                    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.3)",
+                    zIndex: 200,
+                    padding: "4px 0",
+                    minWidth: 130,
+                    display: "flex",
+                    flexDirection: "column",
+                  }}
+                >
+                  <button
+                    onClick={() => {
+                      emitToggle();
+                      setMenuOpen(false);
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "6px 12px",
+                      border: "none",
+                      background: "transparent",
+                      color: "var(--text-color, inherit)",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      fontSize: 12,
+                      width: "100%",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(128, 128, 128, 0.15)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <span style={{ fontSize: 13 }}>⤢</span> Open in modal
+                  </button>
+                  <button
+                    onClick={() => {
+                      refresh();
+                      setMenuOpen(false);
+                    }}
+                    disabled={loading}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "6px 12px",
+                      border: "none",
+                      background: "transparent",
+                      color: "var(--text-color, inherit)",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      fontSize: 12,
+                      width: "100%",
+                      opacity: loading ? 0.5 : 1,
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!loading) e.currentTarget.style.background = "rgba(128, 128, 128, 0.15)";
+                    }}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <span style={{ fontSize: 13 }}>↻</span> Refresh
+                  </button>
+                  <button
+                    onClick={() => {
+                      setCollapsed(true);
+                      setMenuOpen(false);
+                    }}
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 8,
+                      padding: "6px 12px",
+                      border: "none",
+                      background: "transparent",
+                      color: "var(--text-color, inherit)",
+                      cursor: "pointer",
+                      textAlign: "left",
+                      fontSize: 12,
+                      width: "100%",
+                    }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(128, 128, 128, 0.15)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <span style={{ fontSize: 13 }}>▶</span> Collapse
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        )}
       </div>
       <div
         style={{

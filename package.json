@@ -1,6 +1,6 @@
 {
   "name": "constellation",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Interactive note graph for Inkdrop — visualize notes as a constellation of links, tags, and notebooks",
   "main": "./lib/index",
   "author": "p1n9d3v",
