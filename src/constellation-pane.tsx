@@ -376,6 +376,7 @@ const ConstellationPane: React.FC = () => {
             data={data}
             hideOrphans={hideOrphans}
             showBooks={showBooks}
+            isDragging={isDragging}
           />
         ) : (
           <div

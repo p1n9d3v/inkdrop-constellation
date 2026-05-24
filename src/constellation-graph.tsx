@@ -43,6 +43,7 @@ type Props = {
   data: GraphData;
   hideOrphans: boolean;
   showBooks: boolean;
+  isDragging?: boolean;
   onAfterOpen?: () => void;
 };
 
@@ -70,9 +71,17 @@ function defaultCameraDistance(scale: number, width: number, height: number): nu
   return clamp(Math.max(fitWidth, fitHeight) * 0.96, scale * 4.25, scale * 6.55);
 }
 
-function clampLabelX(element: HTMLElement, x: number, width: number): number {
+function clampLabelX(
+  element: HTMLElement,
+  x: number,
+  width: number,
+  obj: { labelWidth?: number }
+): number {
+  if (obj.labelWidth === undefined || obj.labelWidth === 0) {
+    obj.labelWidth = element.offsetWidth || 0;
+  }
   const halfWidth = Math.min(
-    element.offsetWidth / 2 || 0,
+    obj.labelWidth / 2,
     Math.max(0, width / 2 - LABEL_MARGIN)
   );
   const min = LABEL_MARGIN + halfWidth;
@@ -84,6 +93,7 @@ const ConstellationGraph: React.FC<Props> = ({
   data,
   hideOrphans,
   showBooks,
+  isDragging = false,
   onAfterOpen,
 }) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -92,10 +102,19 @@ const ConstellationGraph: React.FC<Props> = ({
   const hideOrphansRef = React.useRef(hideOrphans);
   const showBooksRef = React.useRef(showBooks);
   const onAfterOpenRef = React.useRef(onAfterOpen);
+  const isDraggingRef = React.useRef(isDragging);
+  const triggerResizeRef = React.useRef<() => void>(() => {});
 
   hideOrphansRef.current = hideOrphans;
   showBooksRef.current = showBooks;
   onAfterOpenRef.current = onAfterOpen;
+  isDraggingRef.current = isDragging;
+
+  React.useEffect(() => {
+    if (!isDragging) {
+      triggerResizeRef.current();
+    }
+  }, [isDragging]);
 
   React.useEffect(() => {
     const container = containerRef.current;
@@ -290,6 +309,7 @@ const ConstellationGraph: React.FC<Props> = ({
     };
 
     function resize() {
+      if (isDraggingRef.current) return;
       const rect = host.getBoundingClientRect();
       const width = Math.max(1, rect.width);
       const height = Math.max(1, rect.height);
@@ -300,6 +320,8 @@ const ConstellationGraph: React.FC<Props> = ({
       }
       renderer.setSize(width, height, false);
     }
+
+    triggerResizeRef.current = resize;
 
     function setPointerFromEvent(event: PointerEvent | WheelEvent) {
       const rect = renderer.domElement.getBoundingClientRect();
@@ -371,6 +393,20 @@ const ConstellationGraph: React.FC<Props> = ({
       renderer.domElement.style.cursor = "grabbing";
     }
 
+    let spacePressed = false;
+
+    function getMouseWorldPoint(event: WheelEvent) {
+      const rect = renderer.domElement.getBoundingClientRect();
+      const px = ((event.clientX - rect.left) / Math.max(rect.width, 1)) * 2 - 1;
+      const py = -((event.clientY - rect.top) / Math.max(rect.height, 1)) * 2 + 1;
+      
+      const v = new THREE.Vector3(px, py, 0.5);
+      v.unproject(camera);
+      const dir = v.sub(camera.position).normalize();
+      const distance = (brainGroup.position.z - camera.position.z) / dir.z;
+      return camera.position.clone().addScaledVector(dir, distance);
+    }
+
     function onPointerMove(event: PointerEvent) {
       if (drag.down) {
         const dx = event.clientX - drag.lastX;
@@ -378,18 +414,29 @@ const ConstellationGraph: React.FC<Props> = ({
         drag.lastX = event.clientX;
         drag.lastY = event.clientY;
         if (Math.abs(dx) + Math.abs(dy) > 1) drag.moved = true;
-        brainGroup.rotation.y += dx * 0.006;
-        brainGroup.rotation.x = clamp(
-          brainGroup.rotation.x + dy * 0.004,
-          -0.8,
-          0.55
-        );
+
+        if (spacePressed) {
+          const factor = camera.position.z * 0.0016;
+          brainGroup.position.x += dx * factor;
+          brainGroup.position.y -= dy * factor;
+        } else {
+          brainGroup.rotation.y += dx * 0.006;
+          brainGroup.rotation.x = clamp(
+            brainGroup.rotation.x + dy * 0.004,
+            -0.8,
+            0.55
+          );
+        }
         return;
       }
 
       drag.hovered = pickNode(event);
       drag.hoveredEdge = drag.hovered ? null : pickEdge(event);
-      renderer.domElement.style.cursor = drag.hovered ? "pointer" : "grab";
+      renderer.domElement.style.cursor = spacePressed
+        ? "grab"
+        : drag.hovered
+        ? "pointer"
+        : "grab";
       const tooltipText = drag.hovered
         ? `${drag.hovered.title} · ${drag.hovered.degree} links`
         : drag.hoveredEdge?.label ?? null;
@@ -401,7 +448,11 @@ const ConstellationGraph: React.FC<Props> = ({
       if (renderer.domElement.hasPointerCapture(event.pointerId)) {
         renderer.domElement.releasePointerCapture(event.pointerId);
       }
-      renderer.domElement.style.cursor = drag.hovered ? "pointer" : "grab";
+      renderer.domElement.style.cursor = spacePressed
+        ? "grab"
+        : drag.hovered
+        ? "pointer"
+        : "grab";
       if (drag.moved) return;
 
       const node = drag.hovered ?? pickNode(event);
@@ -422,7 +473,7 @@ const ConstellationGraph: React.FC<Props> = ({
       drag.down = false;
       drag.hovered = null;
       drag.hoveredEdge = null;
-      renderer.domElement.style.cursor = "grab";
+      renderer.domElement.style.cursor = spacePressed ? "grab" : "grab";
       const tooltip = tooltipRef.current;
       if (tooltip) {
         tooltip.style.opacity = "0";
@@ -433,11 +484,53 @@ const ConstellationGraph: React.FC<Props> = ({
     function onWheel(event: WheelEvent) {
       event.preventDefault();
       userZoomed = true;
+
+      // Update camera matrix before the first unprojection
+      camera.updateMatrixWorld();
+      const pBefore = getMouseWorldPoint(event);
+
       camera.position.z = clamp(
         camera.position.z + event.deltaY * 0.18,
         layout.scale * 1.35,
         layout.scale * 8.5
       );
+      camera.updateProjectionMatrix();
+
+      // Update camera matrix again after setting new position
+      camera.updateMatrixWorld();
+      const pAfter = getMouseWorldPoint(event);
+      
+      const diff = pAfter.sub(pBefore);
+      brainGroup.position.add(diff);
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.code === "Space" || event.key === " ") {
+        const active = document.activeElement;
+        if (active && (
+          active.tagName === "INPUT" ||
+          active.tagName === "TEXTAREA" ||
+          active.classList.contains("CodeMirror-code") ||
+          active.getAttribute("contenteditable") === "true" ||
+          active.closest(".editor")
+        )) {
+          return;
+        }
+        spacePressed = true;
+        event.preventDefault();
+        renderer.domElement.style.cursor = drag.down ? "grabbing" : "grab";
+      }
+    }
+
+    function onKeyUp(event: KeyboardEvent) {
+      if (event.code === "Space" || event.key === " ") {
+        spacePressed = false;
+        renderer.domElement.style.cursor = drag.down
+          ? "grabbing"
+          : drag.hovered
+          ? "pointer"
+          : "grab";
+      }
     }
 
     renderer.domElement.addEventListener("pointerdown", onPointerDown);
@@ -445,6 +538,8 @@ const ConstellationGraph: React.FC<Props> = ({
     renderer.domElement.addEventListener("pointerup", onPointerUp);
     renderer.domElement.addEventListener("pointerleave", onPointerLeave);
     renderer.domElement.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("keydown", onKeyDown);
+    window.addEventListener("keyup", onKeyUp);
 
     const resizeObserver = new ResizeObserver(resize);
     resizeObserver.observe(host);
@@ -460,7 +555,12 @@ const ConstellationGraph: React.FC<Props> = ({
     function updateBooks(width: number, height: number, formed: number) {
       bookGroup.visible = showBooksRef.current;
       if (!showBooksRef.current) {
-        for (const book of renderBooks) book.label.style.opacity = "0";
+        for (const book of renderBooks) {
+          if (book.label.style.opacity !== "0") {
+            book.label.style.opacity = "0";
+            book.label.style.transform = "translate3d(-9999px, -9999px, 0)";
+          }
+        }
         return;
       }
 
@@ -474,7 +574,10 @@ const ConstellationGraph: React.FC<Props> = ({
 
         if (tmpVectors.length === 0) {
           book.mesh.visible = false;
-          book.label.style.opacity = "0";
+          if (book.label.style.opacity !== "0") {
+            book.label.style.opacity = "0";
+            book.label.style.transform = "translate3d(-9999px, -9999px, 0)";
+          }
           continue;
         }
 
@@ -492,22 +595,31 @@ const ConstellationGraph: React.FC<Props> = ({
 
         book.mesh.getWorldPosition(tmpWorld);
         tmpScreen.copy(tmpWorld).project(camera);
+        const behindCamera = tmpScreen.z < -1 || tmpScreen.z > 1;
+        if (behindCamera) {
+          if (book.label.style.opacity !== "0") {
+            book.label.style.opacity = "0";
+            book.label.style.transform = "translate3d(-9999px, -9999px, 0)";
+          }
+          continue;
+        }
+
         const x = clampLabelX(
           book.label,
           (tmpScreen.x * 0.5 + 0.5) * width,
-          width
+          width,
+          book
         );
         const y = (-tmpScreen.y * 0.5 + 0.5) * height;
-        const behindCamera = tmpScreen.z < -1 || tmpScreen.z > 1;
-        book.label.style.opacity = behindCamera
-          ? "0"
-          : String(0.18 + 0.24 * formed);
+        const targetOpacity = String(0.18 + 0.24 * formed);
+        if (book.label.style.opacity !== targetOpacity) {
+          book.label.style.opacity = targetOpacity;
+        }
         book.label.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -100%)`;
       }
     }
 
     function updateNodeLabels(width: number, height: number, formed: number) {
-      const zoomedForLabels = camera.position.z < layout.scale * 2.75;
       const hoveredIndex = drag.hovered ? renderNodes.indexOf(drag.hovered) : -1;
       const edgeFrom = drag.hoveredEdge?.from ?? -1;
       const edgeTo = drag.hoveredEdge?.to ?? -1;
@@ -517,13 +629,13 @@ const ConstellationGraph: React.FC<Props> = ({
         const hidden = hideOrphansRef.current && node.orphan;
         const endpoint = i === edgeFrom || i === edgeTo;
         const prominent = node.hub || i === hoveredIndex || endpoint;
-        const visible =
-          formed > 0.72 &&
-          !hidden &&
-          (prominent || (zoomedForLabels && node.degree >= 2));
+        const visible = formed > 0.72 && !hidden && prominent;
 
         if (!visible) {
-          node.labelEl.style.opacity = "0";
+          if (node.labelEl.style.opacity !== "0") {
+            node.labelEl.style.opacity = "0";
+            node.labelEl.style.transform = "translate3d(-9999px, -9999px, 0)";
+          }
           continue;
         }
 
@@ -531,19 +643,26 @@ const ConstellationGraph: React.FC<Props> = ({
         tmpScreen.copy(tmpWorld).project(camera);
         const behindCamera = tmpScreen.z < -1 || tmpScreen.z > 1;
         if (behindCamera) {
-          node.labelEl.style.opacity = "0";
+          if (node.labelEl.style.opacity !== "0") {
+            node.labelEl.style.opacity = "0";
+            node.labelEl.style.transform = "translate3d(-9999px, -9999px, 0)";
+          }
           continue;
         }
 
         const x = clampLabelX(
           node.labelEl,
           (tmpScreen.x * 0.5 + 0.5) * width,
-          width
+          width,
+          node
         );
         const y = (-tmpScreen.y * 0.5 + 0.5) * height;
-        node.labelEl.style.opacity = String(
+        const targetOpacity = String(
           i === hoveredIndex || endpoint ? 1 : node.hub ? 0.82 : 0.52
         );
+        if (node.labelEl.style.opacity !== targetOpacity) {
+          node.labelEl.style.opacity = targetOpacity;
+        }
         node.labelEl.style.transform = `translate3d(${x}px, ${y}px, 0) translate(-50%, -145%)`;
       }
     }
@@ -648,6 +767,8 @@ const ConstellationGraph: React.FC<Props> = ({
       renderer.domElement.removeEventListener("pointerup", onPointerUp);
       renderer.domElement.removeEventListener("pointerleave", onPointerLeave);
       renderer.domElement.removeEventListener("wheel", onWheel);
+      window.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener("keyup", onKeyUp);
       labels.innerHTML = "";
       disposeObject(scene);
       renderer.dispose();

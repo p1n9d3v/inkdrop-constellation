@@ -17,6 +17,7 @@ export type RenderNode = {
     delayMs: number;
     phase: number;
     hub: boolean;
+    labelWidth?: number;
 };
 export type RenderEdge = {
     from: number;
@@ -28,6 +29,7 @@ export type RenderBook = {
     memberIndexes: number[];
     mesh: THREE.Mesh<THREE.SphereGeometry, THREE.MeshBasicMaterial>;
     label: HTMLDivElement;
+    labelWidth?: number;
 };
 export declare const FORMATION_MS = 3200;
 export declare const MAX_PIXEL_RATIO = 2;

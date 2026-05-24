@@ -4,6 +4,7 @@ type Props = {
     data: GraphData;
     hideOrphans: boolean;
     showBooks: boolean;
+    isDragging?: boolean;
     onAfterOpen?: () => void;
 };
 declare const ConstellationGraph: React.FC<Props>;
